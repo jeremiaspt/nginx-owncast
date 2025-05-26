@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   nginx:
     image: nginx:alpine
@@ -24,13 +22,11 @@ services:
     volumes:
       - owncast_data:/app/data
     ports:
-      - "127.0.0.1:8080:8080" # Only accessible locally or via nginx
-      - "1935:1935" # RTMP port available to local LAN
+      - "8080:8080" # Only accessible via nginx
+      - "127.0.0.1:1935:1935" # RTMP port available to local LAN
     networks:
       - backend
     restart: unless-stopped
-    environment:
-      - OWNCAST_ADMIN_PASSWORD=changeme # Change this to a secure password
 
 networks:
   frontend:
