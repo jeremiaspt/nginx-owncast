@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+      - nginx_cache:/var/cache/nginx
+    networks:
+      - frontend
+      - backend
+    restart: unless-stopped
+    depends_on:
+      - owncast
+
+  owncast:
+    image: owncast/owncast:latest
+    container_name: owncast
+    volumes:
+      - owncast_data:/app/data
+    ports:
+      - "127.0.0.1:8080:8080" # Only accessible locally or via nginx
+      - "1935:1935" # RTMP port available to local LAN
+    networks:
+      - backend
+    restart: unless-stopped
+    environment:
+      - OWNCAST_ADMIN_PASSWORD=changeme # Change this to a secure password
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true # This ensures backend services aren't accessible from outside
+
+volumes:
+  owncast_data:
+  nginx_cache:
